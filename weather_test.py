@@ -1,6 +1,6 @@
 import requests
 
-# IP 주소 기반 위치 정보를 가져오는 함수 (ipinfo.io API 사용)
+# IP 주소 기반 위치 정보를 가져오는 함수 (ipinfo.io API)
 def get_location_from_ip():
     response = requests.get('http://ipinfo.io/')
     data = response.json()
@@ -8,9 +8,9 @@ def get_location_from_ip():
 
 # OpenWeatherMap API를 통해 위도/경도로 변환한 후 날씨 정보를 가져오는 함수
 def get_weather(city):
-    api_key = '34ca17f9b51486bfaeaf8d66c7fde8fd'  # OpenWeatherMap API 키 입력
+    api_key = '34ca17f9b51486bfaeaf8d66c7fde8fd'  # 본인의 OpenWeatherMap API 키 넣어서 사용
 
-    # 1. 도시명을 위도와 경도로 변환 (Geocoding API 사용)
+    # ipinfo api를 통해 가져온 주소를 위도와 경도로 변환 (Geocoding API 사용)
     geo_api_url = f"http://api.openweathermap.org/geo/1.0/direct?q={city}&limit=1&appid={api_key}"
     geo_response = requests.get(geo_api_url)
     geo_data = geo_response.json()
@@ -22,12 +22,12 @@ def get_weather(city):
     lat = geo_data[0]['lat']
     lon = geo_data[0]['lon']
 
-    # 2. 위도와 경도를 사용하여 날씨 정보 요청 (Weather API 사용)
+    # 변환된 위도와 경도를 사용하여 날씨 정보 요청 (openweather API)
     weather_api_url = f"http://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={api_key}&units=metric"
     weather_response = requests.get(weather_api_url)
     weather_data = weather_response.json()
 
-    # 날씨 정보 출력
+    # 날씨 데이터 중 기온과 습도만 추출
     if weather_data['cod'] == 200:
         main = weather_data['main']
         temperature = main['temp']
@@ -37,7 +37,6 @@ def get_weather(city):
         print(f"날씨 정보를 가져오는 데 실패했습니다: {weather_data['message']}")
         return None
 
-# 메인 실행 함수
 def main():
     city, region, country = get_location_from_ip()
     print(f"현재 IP 기반 위치: {city}, {region}, {country}")
